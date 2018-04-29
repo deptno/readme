@@ -8,7 +8,7 @@
   "private": true,
   "scripts": {
     "start": "node packages/readme",
-    "build": "tsc",
+    "build": "tsc"
   },
   "workspaces": [
     "packages/*"

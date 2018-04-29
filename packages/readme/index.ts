@@ -1,19 +1,37 @@
 import {mp3} from 'speech'
-import {writeFileSync} from 'fs'
+import * as fs from 'fs'
 import {getFeed} from '../feed'
 import {sanitize} from '../html'
+import * as filenamify from 'filenamify'
+import {promisify} from 'util'
 
-export default async function main(mediumId: string) {
+const writeFile = promisify(fs.writeFile)
+
+export default async function main(mediumId: string, index?: number) {
   const {items} = await getFeed(mediumId)
+  const feeds = typeof index === 'number'
+    ? items.slice(index, index + 1)
+    : items
 
-  items.forEach(async feed => {
-    const {title, 'content:encoded': content} = feed
-    const santitized = sanitize(content)
+  await Promise.all(
+    feeds.map(feed => {
+      const {title, 'content:encoded': content} = feed
+      const santitized = sanitize(content)
+      const fileName = filenamify(title)
 
-    console.log('result')
-    console.log(santitized)
+      console.log(santitized.length, 'chunks')
 
-    const stream = await mp3(santitized)
-    writeFileSync(`${title}.mp3`, stream)
-  })
+      return Promise.all(
+        santitized.map(async (chunk, index) => {
+          const mp3FileName = `${fileName}-${index}.mp3`
+          const stream = await mp3(chunk)
+
+          await writeFile(mp3FileName, stream)
+          console.log('created:', mp3FileName)
+        })
+      )
+    })
+  )
+
+  console.log('done!')
 }

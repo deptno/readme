@@ -12,6 +12,7 @@ export function mp3(Text: string): Promise<AudioStream> {
   return new Promise<AudioStream>(resolve => {
     polly.synthesizeSpeech({VoiceId, OutputFormat, SampleRate, Text}, (err, data) => {
       if (err) {
+        console.error('speech', err)
         return resolve()
       }
       resolve(data.AudioStream)

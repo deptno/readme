@@ -1,7 +1,7 @@
 import {JSDOM} from 'jsdom'
 import * as R from 'ramda'
 
-export function sanitize(html: string): string {
+export function sanitize(html: string): string[] {
   const textNode = (node: Node): boolean => {
     if (!node.firstChild) {
       return false
@@ -27,7 +27,17 @@ export function sanitize(html: string): string {
     .filter(textNode)
     .filter(R.compose(R.not, useless, R.prop('nodeName')))
     .map(replace)
-    .join('\n')
+    .reduce((ret, curr, index, array) => {
+      const lastIndex = R.length(ret) - 1
+      const total = R.add(ret[lastIndex].length, curr.length)
+
+      if (total > 1500) {
+        ret.push(curr)
+      } else {
+        ret[lastIndex] += curr
+      }
+      return ret
+    }, [''])
 }
 
 function elements(html: string): Node[] {
