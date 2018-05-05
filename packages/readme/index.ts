@@ -4,8 +4,22 @@ import {getFeed} from '../feed'
 import {sanitize} from '../html'
 import * as filenamify from 'filenamify'
 import {promisify} from 'util'
+import * as R from 'ramda'
 
 const writeFile = promisify(fs.writeFile)
+const split1500 = (texts: string[]): string[] => {
+  return texts.reduce((ret, curr, index, array) => {
+    const lastIndex = R.length(ret) - 1
+    const total = R.add(ret[lastIndex].length, curr.length)
+
+    if (total > 1500) {
+      ret.push(curr)
+    } else {
+      ret[lastIndex] += curr
+    }
+    return ret
+  }, [''])
+}
 
 export default async function main(mediumId: string, index?: number) {
   const {items} = await getFeed(mediumId)
@@ -21,15 +35,13 @@ export default async function main(mediumId: string, index?: number) {
 
       console.log(santitized.length, 'chunks')
 
-      return Promise.all(
-        santitized.map(async (chunk, index) => {
-          const mp3FileName = `${fileName}-${index}.mp3`
-          const stream = await mp3(chunk)
+      return Promise.all(split1500(santitized).map(async (chunk, index) => {
+        const mp3FileName = `${fileName}-${index}.mp3`
+        const stream = await mp3(chunk)
 
-          await writeFile(mp3FileName, stream)
-          console.log('created:', mp3FileName)
-        })
-      )
+        await writeFile(mp3FileName, stream)
+        console.log('created:', mp3FileName)
+      }))
     })
   )
 

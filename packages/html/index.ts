@@ -15,10 +15,10 @@ export function sanitize(html: string): string[] {
     R.cond([
       [R.equals('H3'), R.always('제목')],
       [R.equals('H4'), R.always('부제')],
-    ])
+    ]),
   )
   const needReplace = (node: Node) => ['H3', 'H4',].some(t => t === node.nodeName)
-  const replace = R.cond([
+  const replaceTag = R.cond([
     [needReplace, (node: Node) => substitution(node.nodeName) + node.textContent],
     [R.T, (node: Node) => node.textContent]
   ])
@@ -26,18 +26,7 @@ export function sanitize(html: string): string[] {
   return elements(html)
     .filter(textNode)
     .filter(R.compose(R.not, useless, R.prop('nodeName')))
-    .map(replace)
-    .reduce((ret, curr, index, array) => {
-      const lastIndex = R.length(ret) - 1
-      const total = R.add(ret[lastIndex].length, curr.length)
-
-      if (total > 1500) {
-        ret.push(curr)
-      } else {
-        ret[lastIndex] += curr
-      }
-      return ret
-    }, [''])
+    .map(replaceTag)
 }
 
 function elements(html: string): Node[] {

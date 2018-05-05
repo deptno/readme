@@ -7,9 +7,7 @@ export function getFeed(id: string): Promise<FeedMe.Document> {
       const parser = new FeedMe(true)
 
       res.pipe(parser)
-      parser.on('end', () => {
-        resolve(parser.done())
-      })
+      parser.on('end', () => resolve(parser.done()))
     })
   })
 }
