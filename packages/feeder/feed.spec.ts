@@ -1,9 +1,6 @@
 import * as fetch from 'jest-fetch-mock'
 import {subscriptions} from './index'
 
-(global as any).fetch = fetch
-
-console.log(fetch)
 describe('feeder', () => {
   describe('provider', () => {
     beforeEach(() => fetch.resetMocks())
