@@ -17,7 +17,7 @@ export function sanitize(html: string): string[] {
       [R.equals('H4'), R.always('부제')],
     ]),
   )
-  const needReplace = (node: Node) => ['H3', 'H4',].some(t => t === node.nodeName)
+  const needReplace = (node: Node) => ['H3', 'H4'].some(R.equals(node.nodeName))
   const replaceTag = R.cond([
     [needReplace, (node: Node) => substitution(node.nodeName) + node.textContent],
     [R.T, (node: Node) => node.textContent]
