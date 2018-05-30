@@ -9,11 +9,9 @@ export function sanitize(html: string): string[] {
       R.path(['firstChild', 'nodeType']),
       R.prop('TEXT_NODE')]))
   const breathe = R.concat(R.__, ', ') as any as (_: string) => string
-  // const useless = (tag: string) => R.any(R.equals(tag), ['html', 'head', 'body', 'figure', 'img', 'figcaption'])
   const useless = R.compose(
     R.any(R.__, ['html', 'head', 'body', 'figure', 'img', 'figcaption']) as any as (_: any) => boolean,
-    R.equals
-  )
+    R.equals)
   const substitution = R.compose(
     breathe,
     R.cond([
