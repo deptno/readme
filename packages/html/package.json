@@ -13,6 +13,6 @@
   "devDependencies": {
     "@types/feedme": "^1.0.0",
     "@types/jsdom": "^11.0.4",
-    "@types/ramda": "^0.25.24"
+    "@types/ramda": "^0.25.30"
   }
 }
